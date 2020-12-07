@@ -65,9 +65,6 @@ pub fn create_block(pos: Position, shape: Shape, color: BlockColor, commands: &m
 
 pub struct Cell;
 
-const CELL_WIDTH: i32 = 100;
-const CELL_HEIGHT: i32 = 100;
-
 pub fn create_cell(pos: Position, color: BlockColor, commands: &mut Commands, materials: &Res<Materials>) -> Entity {
     commands.spawn(SpriteComponents {
         material: materials.get_material(color),
@@ -103,6 +100,7 @@ pub fn init_materials(
     mat_assets.red_mat = color_mat_res.add(ColorMaterial::color(Color::rgb(1.0, 0.0, 0.0)));
     mat_assets.blue_mat = color_mat_res.add(ColorMaterial::color(Color::rgb(0.0, 0.0, 1.0)));
     mat_assets.green_mat = color_mat_res.add(ColorMaterial::color(Color::rgb(0.0, 1.0, 0.0)));
+
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -122,6 +120,7 @@ fn main() {
             ..Default::default()
         })
         .add_resource(Materials::default())
+        .add_startup_system(init_materials.system())
         .add_startup_system(test_init.system())
         .add_system(transform_cell.system())
         .add_plugins(DefaultPlugins)
