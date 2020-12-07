@@ -71,7 +71,7 @@ const CELL_HEIGHT: i32 = 100;
 pub fn create_cell(pos: Position, color: BlockColor, commands: &mut Commands, materials: &Res<Materials>) -> Entity {
     commands.spawn(SpriteComponents {
         material: materials.get_material(color),
-        sprite: Sprite::new(Vec2::new(CELL_WIDTH as f32, CELL_HEIGHT as f32)),
+        sprite: Sprite::new(Vec2::new(1.0, 1.0)),
         ..Default::default()
     })
     .with(Cell)
@@ -123,17 +123,32 @@ fn main() {
         })
         .add_resource(Materials::default())
         .add_startup_system(test_init.system())
+        .add_system(transform_cell.system())
         .add_plugins(DefaultPlugins)
         .run();
 }
 
 fn test_init(mut commands: Commands, materials: Res<Materials>) {
     commands.spawn(Camera2dComponents::default());
-    create_block(Position::new(1, 1), Shape::Rect, BlockColor::RED, &mut commands, &materials);
+    create_block(Position::new(0, 0), Shape::Rect, BlockColor::RED, &mut commands, &materials);
 }
 
-fn transform_cell(mut query: Query<(&Cell, &Position, &mut Transform)>) {
-    for (_, pos, transform) in query.iter_mut() {
+const CELLS_IN_ROW: i32 = 10;
+const CELLS_IN_COLUMN: i32 = 16;
 
+fn transform_cell(windows: Res<Windows>, mut query: Query<(&Cell, &Position, &mut Transform, &mut Sprite)>) {
+    let window = windows.get_primary().unwrap();
+
+    let cell_width = window.width() as i32 / CELLS_IN_ROW;
+    let cell_height = window.height() as i32 / CELLS_IN_COLUMN;
+
+    for (_, pos, mut transform, mut sprite) in query.iter_mut() {
+        let x = pos.x * cell_width + cell_width / 2 - (window.width() as i32 / 2);
+        let y = pos.y * cell_height + cell_height / 2 - (window.height() as i32 / 2);
+
+        transform.translation.set_x(x as f32);
+        transform.translation.set_y(y as f32);
+
+        sprite.size = Vec2::new(cell_width as f32, cell_height as f32);
     }
 }
