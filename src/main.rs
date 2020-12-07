@@ -128,6 +128,7 @@ fn main() {
 }
 
 fn test_init(mut commands: Commands, materials: Res<Materials>) {
+    commands.spawn(Camera2dComponents::default());
     create_block(Position::new(1, 1), Shape::Rect, BlockColor::RED, &mut commands, &materials);
 }
 
